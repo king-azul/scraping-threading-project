@@ -1,5 +1,6 @@
 import glob
 import os
+import datetime
 import pandas as pd
 from time import sleep
 from Scraper import Scraper
@@ -18,7 +19,10 @@ all_filenames = [i for i in glob.glob("Quotes*.{}".format("csv"))]
 combined_df = pd.concat([pd.read_csv(f) for f in all_filenames])
 combined_df = combined_df.sort_values(by=["page"])
 combined_df["index"] = range(1, len(combined_df) + 1)
-combined_df.set_index("index").to_csv("All_Quotes.csv")
+print(datetime.date.today().strftime("%d%m%Y"))
+combined_df.set_index("index").to_csv(
+    "Quotes-" + datetime.date.today().strftime("%Y%m%d") + ".csv"
+)
 
 # Remove unwanted csv files
 for f in all_filenames:
