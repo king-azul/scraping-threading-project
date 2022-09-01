@@ -20,7 +20,7 @@ combined_df = pd.concat([pd.read_csv(f) for f in all_filenames])
 combined_df = combined_df.sort_values(by=["page"])
 combined_df["index"] = range(1, len(combined_df) + 1)  # Add index col
 combined_df.set_index("index").to_csv(
-    "Quotes" + datetime.date.today().strftime("%Y%m%d") + ".csv"
+    "Quotes-" + datetime.date.today().strftime("%Y%m%d") + ".csv"
 )
 
 # Remove unwanted csv files
