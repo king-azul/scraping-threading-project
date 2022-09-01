@@ -2,7 +2,7 @@ import threading
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, date
 
 
 class Scraper:
@@ -73,5 +73,12 @@ class Scraper:
     # Outputs to a CSV file
     def load(self, data):
         df = pd.DataFrame(data)
-        df.to_csv("Quotes" + str(self.page) + ".csv", index=False)
+        df.to_csv(
+            "QuotesPage"
+            + str(self.page)
+            + "-"
+            + date.today().strftime("%Y%m%d")
+            + ".csv",
+            index=False,
+        )
         return
