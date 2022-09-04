@@ -1,40 +1,30 @@
-import threading
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-from datetime import datetime, date
+from datetime import date
 
 
 class Scraper:
-    def __init__(self, url="", page=0):
-        # Set object variables
-        self.url = url + f"/page/{page}/"
-        self.page = page
-
-        # Start multithreading
-        t = threading.Thread(target=self.etl)
-        t.start()
-
     # Extract, Transform, Load
-    def etl(self):
-        print("START:", datetime.now())
-        self.load(self.transform(self.extract()))
-        print("END:", datetime.now())
+    def etl(self, url="", page=0):
+        # Set object variables
+        return self.load(self.transform(self.extract(url, page), page), page)
 
     # Takes page number, returns soup html
-    def extract(self):
+    def extract(self, url="", page=0):
+        full_url = url + f"/page/{page}/"
         # print("BEGIN EXTRACT")
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.5112.102 Safari/537.36"
         }
-        r = requests.get(self.url, headers)
+        r = requests.get(full_url, headers)
         # print("STATUS CODE:", r.status_code)
         soup = BeautifulSoup(r.content, "html.parser")
         # print("END EXTRACT")
         return soup
 
     # Takes html page, parses the data, returns list of quotes found
-    def transform(self, soup):
+    def transform(self, soup, page=0):
         # print("BEGIN TRANSFORM")
         quotes = []
         divs = soup.find_all("div", class_="quote")
@@ -59,7 +49,7 @@ class Scraper:
             )
             # print("TAGS:", tags)
             quote = {
-                "page": self.page,
+                "page": page,
                 "text": text,
                 "author": author,
                 "tags": "[" + "; ".join(tags) + "]",
@@ -71,14 +61,13 @@ class Scraper:
         return quotes
 
     # Outputs to a CSV file
-    def load(self, data):
+    def load(self, data, page=0):
         df = pd.DataFrame(data)
+        csv_filename = (
+            "QuotesPage" + str(page) + "-" + date.today().strftime("%Y%m%d") + ".csv"
+        )
         df.to_csv(
-            "QuotesPage"
-            + str(self.page)
-            + "-"
-            + date.today().strftime("%Y%m%d")
-            + ".csv",
+            csv_filename,
             index=False,
         )
-        return
+        return csv_filename
