@@ -25,14 +25,13 @@ if __name__ == "__main__":
     print(f"Finished in {round(finish-start,2)} second(s)")
 
     # Combine all csv files
-    all_filenames = [i for i in glob.glob("QuotesPage*.{}".format("csv"))]
+    all_filenames = glob.glob("QuotesPage*.{}".format("csv"))
+    final_filename = "Quotes-" + datetime.date.today().strftime("%Y%m%d") + ".csv"
     combined_df = pd.concat([pd.read_csv(f) for f in all_filenames])
     combined_df = combined_df.sort_values(by=["page"])
     combined_df["index"] = range(1, len(combined_df) + 1)  # Add index col
-    combined_df.set_index("index").to_csv(
-        "Quotes-" + datetime.date.today().strftime("%Y%m%d") + ".csv"
-    )
-
-    # Remove unwanted csv files
+    combined_df.set_index("index").to_csv(final_filename)
     for f in all_filenames:
-        os.remove(f)
+        os.remove(f)  # Remove unwanted csv files
+    print(f"Final CSV: {final_filename}")
+    assert os.path.exists(final_filename)  # Checks successful creation of csv
